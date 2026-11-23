@@ -11,16 +11,17 @@ def load_voice_encoder():
 
 
 def get_voice_embedding(audio_bytes):
-    try:
-        encoder = load_voice_encoder()
+    if not audio_bytes:
+        raise ValueError("The voice recording is empty.")
 
-        audio, sr = librosa.load(io.BytesIO(audio_bytes), sr=16000)
-        wav = preprocess_wav(audio)
-        embedding = encoder.embed_utterance(wav)
-        return embedding.tolist()
-    except Exception as e:
-        st.error('Voice recog error')
-        return None
+    encoder = load_voice_encoder()
+    audio, _ = librosa.load(io.BytesIO(audio_bytes), sr=16000)
+    if audio.size == 0:
+        raise ValueError("No audio could be decoded from the voice recording.")
+
+    wav = preprocess_wav(audio)
+    embedding = encoder.embed_utterance(wav)
+    return embedding.tolist()
     
 
 def identify_speaker(new_embedding, candidates_dict, threshold=0.65):

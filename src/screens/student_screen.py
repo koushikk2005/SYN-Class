@@ -164,8 +164,12 @@ def student_screen():
                             face_emb = encodings[0].tolist()
 
                             voice_emb = None
-                            if audio_data:
-                                voice_emb = get_voice_embedding(audio_data.read())
+                            if audio_data is not None:
+                                try:
+                                    voice_emb = get_voice_embedding(audio_data.getvalue())
+                                except Exception as e:
+                                    st.error(f"Could not process the voice recording: {e}")
+                                    return
 
                             response_data = create_student(new_name, face_embedding=face_emb, voice_embedding=voice_emb)
 
